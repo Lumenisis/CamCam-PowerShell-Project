@@ -1,5 +1,6 @@
 # #################################### #
 # Création automatique des répertoires #
+#    Copie automatique des fichiers    #
 # #################################### #
 
 $vraiTemp = 'Le répertoire Temporaire existe'
@@ -20,8 +21,15 @@ if (Test-Path -Path C:\Temporaire)
     }
 
 # Création d'un tableau
-$array = 'EXE','LOGS','SAV'
+$array = 'exe','logs','sav'
 $counter = 0
+
+# Création d'une fonction
+Function Dossier
+{
+    Set-Location C:\Temporaire
+    New-Item -Name $array[$counter] -ItemType directory
+}
 
 # Test et création des sous-dossiers
 While ($counter -lt $array.Length)
@@ -33,8 +41,13 @@ While ($counter -lt $array.Length)
         else
         {
             $faux
-            Set-Location C:\Temporaire
-            New-Item -Name $array[$counter] -ItemType directory
+            Dossier
             $counter = $counter+1
         }
 }
+
+# Copie des fichiers dans les sous-dossiers
+Copy-Item -Path C:\Windows\*.exe -Destination C:\Temporaire\exe\
+Copy-Item -Path C:\Windows\*.logs -Destination C:\Temporaire\logs\
+Set-Location C:\Windows\
+Get-ChildItem -Attributes !Directory | Where-Object {$_.Length -le 10KB } | Copy-Item -Destination C:\Temporaire\sav
